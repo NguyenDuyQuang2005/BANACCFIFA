@@ -1,0 +1,10 @@
+User-agent: *
+Disallow: /admin
+Disallow: /tai-khoan
+Disallow: /nap-tien
+Disallow: /don-hang
+Disallow: /mua/
+Disallow: /dang-nhap
+Disallow: /dang-ky
+Disallow: /quen-mat-khau
+Disallow: /dat-lai-mat-khau

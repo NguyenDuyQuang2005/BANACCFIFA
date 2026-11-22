@@ -1,0 +1,19 @@
+<?php
+
+namespace App\Enums;
+
+enum ProductStatus: string
+{
+    case Available = 'available';
+    case Sold = 'sold';
+    case Hidden = 'hidden';
+
+    public function label(): string
+    {
+        return match ($this) {
+            self::Available => 'Còn hàng',
+            self::Sold => 'Đã bán',
+            self::Hidden => 'Ẩn',
+        };
+    }
+}

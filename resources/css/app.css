@@ -1,0 +1,49 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../../resources/views/**/*.blade.php';
+@source '../../resources/js/**/*.js';
+
+@theme {
+    --font-sans: 'Be Vietnam Pro', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji';
+    --font-display: 'Outfit', ui-sans-serif, system-ui, sans-serif;
+
+    --color-canvas: #090b10;
+    --color-surface: #11141c;
+    --color-surface-2: #181c27;
+    --color-line: #262c3b;
+    --color-primary: #d61f26;
+    --color-primary-dark: #9e1218;
+    --color-accent: #f0c414;
+    --color-ink: #f5f7fb;
+    --color-muted: #9aa3b5;
+}
+
+@layer base {
+    html {
+        scroll-behavior: smooth;
+    }
+
+    body {
+        background-color: var(--color-canvas);
+        color: var(--color-ink);
+        font-family: var(--font-sans);
+    }
+}
+
+@layer components {
+    .pitch-grid {
+        background-image:
+            radial-gradient(circle at top right, color-mix(in oklab, var(--color-primary) 18%, transparent), transparent 32%),
+            radial-gradient(circle at 12% 88%, color-mix(in oklab, var(--color-accent) 10%, transparent), transparent 28%),
+            linear-gradient(to right, color-mix(in oklab, var(--color-line) 55%, transparent) 1px, transparent 1px),
+            linear-gradient(to bottom, color-mix(in oklab, var(--color-line) 55%, transparent) 1px, transparent 1px);
+        background-size: auto, auto, 48px 48px, 48px 48px;
+    }
+
+    .gold-rule {
+        height: 1px;
+        background: linear-gradient(90deg, transparent, var(--color-accent), transparent);
+    }
+}
