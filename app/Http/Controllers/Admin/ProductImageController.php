@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Actions\StoreProductImagesAction;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\ProductImage;
@@ -11,29 +12,43 @@ use Illuminate\Support\Facades\Storage;
 
 class ProductImageController extends Controller
 {
-    public function store(Request $request, Product $product): RedirectResponse
+    public const MAX_FILES = 20;
+
+    /**
+     * @return array<string, list<string>>
+     */
+    public static function rules(bool $required = false): array
+    {
+        return [
+            'images' => [$required ? 'required' : 'nullable', 'array', 'max:'.self::MAX_FILES],
+            'images.*' => ['image', 'max:20480', 'mimes:jpg,jpeg,png,webp'],
+        ];
+    }
+
+    public function store(Request $request, Product $product, StoreProductImagesAction $storeImages): RedirectResponse
     {
         $validated = $request->validate([
-            'image' => ['required', 'image', 'max:20480', 'mimes:jpg,jpeg,png,webp'],
+            ...self::rules(required: true),
             'alt' => ['nullable', 'string', 'max:120'],
             'is_primary' => ['sometimes', 'boolean'],
+        ], [
+            'images.required' => 'Chọn ít nhất 1 ảnh.',
+            'images.max' => 'Tối đa '.self::MAX_FILES.' ảnh mỗi lần tải.',
         ]);
 
-        $path = $request->file('image')->store('products', 'public');
-        $isFirst = $product->images()->doesntExist();
+        $count = $storeImages->handle($product, $request->file('images', []), $validated['alt'] ?? null, $request->boolean('is_primary'));
 
-        if ($request->boolean('is_primary') || $isFirst) {
-            $product->images()->update(['is_primary' => false]);
-        }
+        return back()->with('status', "Đã thêm {$count} ảnh.");
+    }
 
-        $product->images()->create([
-            'path' => $path,
-            'alt' => $validated['alt'] ?? $product->name,
-            'sort_order' => (int) $product->images()->max('sort_order') + 1,
-            'is_primary' => $request->boolean('is_primary') || $isFirst,
-        ]);
+    public function makePrimary(Product $product, ProductImage $image): RedirectResponse
+    {
+        abort_unless($image->product_id === $product->id, 404);
 
-        return back()->with('status', 'Đã thêm ảnh.');
+        $product->images()->update(['is_primary' => false]);
+        ProductImage::query()->whereKey($image->id)->update(['is_primary' => true]);
+
+        return back()->with('status', 'Đã đặt ảnh bìa.');
     }
 
     public function destroy(Product $product, ProductImage $image): RedirectResponse

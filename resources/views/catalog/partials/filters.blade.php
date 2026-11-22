@@ -11,9 +11,9 @@
         </select>
     </label>
 
-    <x-form-input name="price_min" label="Giá từ" type="number" :value="$filters['price_min'] ?? ''" />
-    <x-form-input name="price_max" label="Giá đến" type="number" :value="$filters['price_max'] ?? ''" />
-    <x-form-input name="bp_min" label="BP từ" type="number" :value="$filters['bp_min'] ?? ''" />
+    <x-form-input name="price_min" label="Giá từ" :value="filled($filters['price_min'] ?? null) ? number_format((int) $filters['price_min'], 0, ',', '.') : ''" inputmode="numeric" data-money-input />
+    <x-form-input name="price_max" label="Giá đến" :value="filled($filters['price_max'] ?? null) ? number_format((int) $filters['price_max'], 0, ',', '.') : ''" inputmode="numeric" data-money-input />
+    <x-form-input name="bp_min" label="BP từ (VD: 5.000.000.000)" :value="filled($filters['bp_min'] ?? null) ? number_format((int) $filters['bp_min'], 0, ',', '.') : ''" inputmode="numeric" data-money-input />
     <x-form-input name="ovr_min" label="OVR từ" type="number" :value="$filters['ovr_min'] ?? ''" />
 
     <label class="grid gap-2 text-sm">

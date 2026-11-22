@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Actions\StoreProductImagesAction;
 use App\Enums\ProductStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
@@ -41,11 +42,12 @@ class ProductController extends Controller
         ]);
     }
 
-    public function store(Request $request): RedirectResponse
+    public function store(Request $request, StoreProductImagesAction $storeImages): RedirectResponse
     {
         $product = Product::query()->create($this->validated($request));
+        $imageCount = $storeImages->handle($product, $request->file('images', []));
 
-        return redirect()->route('admin.products.edit', $product)->with('status', 'Đã tạo tài khoản. Có thể thêm ảnh và thông tin đăng nhập.');
+        return redirect()->route('admin.products.edit', $product)->with('status', 'Đã tạo tài khoản'.($imageCount > 0 ? " kèm {$imageCount} ảnh" : '').'.');
     }
 
     public function edit(Product $product): View
@@ -56,7 +58,7 @@ class ProductController extends Controller
         ]);
     }
 
-    public function update(Request $request, Product $product): RedirectResponse
+    public function update(Request $request, Product $product, StoreProductImagesAction $storeImages): RedirectResponse
     {
         $validated = $this->validated($request, $product);
 
@@ -73,8 +75,9 @@ class ProductController extends Controller
         }
 
         $product->update($validated);
+        $imageCount = $storeImages->handle($product, $request->file('images', []));
 
-        return redirect()->route('admin.products.edit', $product)->with('status', 'Đã cập nhật tài khoản.');
+        return redirect()->route('admin.products.edit', $product)->with('status', 'Đã cập nhật tài khoản'.($imageCount > 0 ? " và thêm {$imageCount} ảnh" : '').'.');
     }
 
     public function destroy(Product $product): RedirectResponse
@@ -93,22 +96,42 @@ class ProductController extends Controller
      */
     private function validated(Request $request, ?Product $product = null): array
     {
+        // Prices may be typed as "1.500.000" or "1 500 000"; keep only the digits.
+        $request->merge(collect(['price', 'original_price', 'discount_percent', 'bp'])
+            ->mapWithKeys(fn (string $field): array => [
+                $field => filled($request->input($field)) ? preg_replace('/\D/', '', (string) $request->input($field)) : null,
+            ])
+            ->all());
+
         $validated = $request->validate([
+            ...ProductImageController::rules(),
+            'discount_percent' => ['nullable', 'integer', 'min:1', 'max:99'],
             'category_id' => ['required', 'exists:categories,id'],
             'name' => ['required', 'string', 'max:160'],
             'code' => ['nullable', 'string', 'max:40', Rule::unique('products', 'code')->ignore($product)],
             'slug' => ['nullable', 'string', 'max:180', Rule::unique('products', 'slug')->ignore($product)],
             'description' => ['nullable', 'string', 'max:5000'],
-            'price' => ['required', 'numeric', 'min:0', 'max:50000000'],
-            'original_price' => ['nullable', 'numeric', 'min:0', 'max:50000000'],
-            'bp' => ['nullable', 'numeric', 'min:0', 'max:999'],
+            'price' => ['nullable', 'required_without:discount_percent', 'integer', 'min:0', 'max:1000000000'],
+            'original_price' => ['nullable', 'required_with:discount_percent', 'integer', 'min:0', 'max:1000000000'],
+            'bp' => ['nullable', 'integer', 'min:0', 'max:1000000000000000'],
             'squad' => ['nullable', 'string', 'max:40'],
             'ovr' => ['nullable', 'integer', 'min:1', 'max:200'],
             'featured_players_text' => ['nullable', 'string', 'max:2000'],
             'status' => ['required', Rule::enum(ProductStatus::class)],
             'is_featured' => ['required', 'boolean'],
             'credentials' => ['nullable', 'string', 'max:2000'],
+        ], [
+            'price.required_without' => 'Nhập giá bán, hoặc nhập giá gốc kèm % giảm giá.',
+            'original_price.required_with' => 'Nhập giá gốc để tính giá sau giảm.',
+            'images.max' => 'Tối đa '.ProductImageController::MAX_FILES.' ảnh mỗi lần lưu.',
         ]);
+
+        $originalPrice = isset($validated['original_price']) ? (int) $validated['original_price'] : null;
+        $price = isset($validated['discount_percent'])
+            ? (int) round($originalPrice * (100 - (int) $validated['discount_percent']) / 100)
+            : (int) $validated['price'];
+        $validated['price'] = $price;
+        $validated['original_price'] = $originalPrice !== null && $originalPrice > $price ? $originalPrice : null;
 
         $code = $validated['code'] ?? null;
         $code = $code ?: $this->uniqueCode();
@@ -122,7 +145,7 @@ class ProductController extends Controller
             'slug' => $slug,
             'description' => $validated['description'] ?? null,
             'price' => $validated['price'],
-            'original_price' => $validated['original_price'] ?? null,
+            'original_price' => $validated['original_price'],
             'bp' => $validated['bp'] ?? null,
             'squad' => $validated['squad'] ?? null,
             'ovr' => $validated['ovr'] ?? null,

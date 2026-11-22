@@ -106,6 +106,81 @@ ready(() => {
         });
     };
 
+    const galleryMain = document.querySelector('[data-gallery-main]');
+    const galleryThumbs = [...document.querySelectorAll('[data-gallery-thumb]')];
+
+    galleryThumbs.forEach((thumb) => thumb.addEventListener('click', () => {
+        if (galleryMain) {
+            galleryMain.src = thumb.dataset.galleryThumb;
+        }
+
+        galleryThumbs.forEach((other) => {
+            other.classList.toggle('border-accent', other === thumb);
+            other.classList.toggle('border-line', other !== thumb);
+        });
+    }));
+
+    const digitsOf = (value) => Number(String(value || '').replace(/\D/g, '')) || 0;
+
+    document.querySelectorAll('[data-money-input]').forEach((input) => {
+        input.addEventListener('input', () => {
+            const digits = input.value.replace(/\D/g, '').slice(0, 16);
+            input.value = digits ? Number(digits).toLocaleString('vi-VN') : '';
+        });
+    });
+
+    document.querySelectorAll('[data-price-group]').forEach((group) => {
+        const original = group.querySelector('[data-price-original]');
+        const discount = group.querySelector('[data-price-discount]');
+        const final = group.querySelector('[data-price-final]');
+
+        const fromDiscount = () => {
+            discount.value = discount.value.replace(/\D/g, '').slice(0, 2);
+            const percent = Number(discount.value);
+
+            if (digitsOf(original.value) > 0 && percent > 0) {
+                final.value = Math.round(digitsOf(original.value) * (100 - percent) / 100).toLocaleString('vi-VN');
+            }
+        };
+
+        const fromFinal = () => {
+            const base = digitsOf(original.value);
+            const price = digitsOf(final.value);
+            discount.value = base > 0 && price > 0 && price < base ? String(Math.max(1, Math.round((base - price) / base * 100))) : '';
+        };
+
+        discount.addEventListener('input', fromDiscount);
+        original.addEventListener('input', () => (discount.value ? fromDiscount() : fromFinal()));
+        final.addEventListener('input', fromFinal);
+    });
+
+    document.querySelectorAll('[data-image-picker]').forEach((picker) => {
+        const input = picker.querySelector('[data-image-picker-input]');
+        const preview = picker.querySelector('[data-image-picker-preview]');
+
+        input?.addEventListener('change', () => {
+            preview.replaceChildren();
+
+            [...input.files].forEach((file, index) => {
+                const figure = document.createElement('figure');
+                figure.className = 'relative overflow-hidden rounded-xl border border-line';
+
+                const image = document.createElement('img');
+                image.src = URL.createObjectURL(file);
+                image.alt = file.name;
+                image.className = 'aspect-square w-full object-cover';
+                image.addEventListener('load', () => URL.revokeObjectURL(image.src));
+
+                const caption = document.createElement('figcaption');
+                caption.className = 'truncate px-1 py-0.5 text-[10px] text-muted';
+                caption.textContent = `${index + 1}. ${(file.size / 1024 / 1024).toFixed(1)}MB`;
+
+                figure.append(image, caption);
+                preview.append(figure);
+            });
+        });
+    });
+
     const taxBox = document.querySelector('[data-tax-calculator]');
 
     if (taxBox) {

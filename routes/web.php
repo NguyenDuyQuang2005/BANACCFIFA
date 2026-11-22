@@ -116,6 +116,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         ->parameters(['acc' => 'product'])
         ->names('products');
     Route::post('/acc/{product}/anh', [ProductImageController::class, 'store'])->name('products.images.store');
+    Route::put('/acc/{product}/anh/{image}/bia', [ProductImageController::class, 'makePrimary'])->name('products.images.primary');
     Route::delete('/acc/{product}/anh/{image}', [ProductImageController::class, 'destroy'])->name('products.images.destroy');
 
     Route::get('/nap-tien', [DepositReviewController::class, 'index'])->name('deposits.index');

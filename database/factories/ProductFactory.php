@@ -28,7 +28,7 @@ class ProductFactory extends Factory
             'description' => fake()->sentence(12),
             'price' => fake()->numberBetween(150000, 5000000),
             'original_price' => null,
-            'bp' => fake()->randomFloat(2, 1, 40),
+            'bp' => fake()->numberBetween(1, 40) * 1_000_000_000,
             'squad' => fake()->randomElement(['4-3-3', '4-2-3-1', '5-3-2']),
             'ovr' => fake()->numberBetween(90, 130),
             'featured_players' => [],

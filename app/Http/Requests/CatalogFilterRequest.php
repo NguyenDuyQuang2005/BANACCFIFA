@@ -33,6 +33,12 @@ class CatalogFilterRequest extends FormRequest
 
     protected function prepareForValidation(): void
     {
+        foreach (['price_min', 'price_max', 'bp_min'] as $field) {
+            if (filled($this->input($field))) {
+                $this->merge([$field => preg_replace('/\D/', '', (string) $this->input($field))]);
+            }
+        }
+
         $sort = $this->string('sort')->toString();
 
         if (! in_array($sort, ['newest', 'price_asc', 'price_desc'], true)) {

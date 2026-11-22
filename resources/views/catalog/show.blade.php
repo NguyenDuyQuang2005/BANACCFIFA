@@ -9,17 +9,19 @@
 
         <div class="mt-8 grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
             <div class="space-y-4">
-                <div class="overflow-hidden rounded-3xl border border-line bg-surface-2">
+                <div class="relative aspect-video overflow-hidden rounded-3xl border border-line bg-surface-2">
                     @if ($product->coverUrl())
-                        <img src="{{ $product->coverUrl() }}" alt="{{ $product->name }}" class="aspect-video w-full object-cover">
+                        <img src="{{ $product->coverUrl() }}" alt="{{ $product->name }}" class="absolute inset-0 h-full w-full object-cover" data-gallery-main>
                     @else
-                        <div class="grid aspect-video place-items-center text-muted">Chưa có hình chi tiết</div>
+                        <div class="absolute inset-0 grid place-items-center text-muted">Chưa có hình chi tiết</div>
                     @endif
                 </div>
                 @if ($product->images->count() > 1)
-                    <div class="grid grid-cols-4 gap-3">
+                    <div class="grid grid-cols-4 gap-3 sm:grid-cols-5">
                         @foreach ($product->images as $image)
-                            <img src="{{ $image->url() }}" alt="{{ $image->alt ?? $product->name }}" class="aspect-square rounded-2xl border border-line object-cover">
+                            <button type="button" class="relative aspect-[4/3] overflow-hidden rounded-2xl border {{ $image->is_primary ? 'border-accent' : 'border-line' }} hover:border-accent" data-gallery-thumb="{{ $image->url() }}" aria-label="Xem ảnh {{ $loop->iteration }}">
+                                <img src="{{ $image->url() }}" alt="{{ $image->alt ?? $product->name }}" loading="lazy" class="absolute inset-0 h-full w-full object-cover">
+                            </button>
                         @endforeach
                     </div>
                 @endif
@@ -30,7 +32,12 @@
                 <h1 class="mt-2 font-display text-3xl font-semibold">{{ $product->name }}</h1>
                 <p class="mt-3 text-sm text-accent">{{ $product->status->label() }}</p>
                 @if ($product->formattedOriginalPrice())
-                    <p class="mt-4 text-sm text-muted line-through">{{ $product->formattedOriginalPrice() }}</p>
+                    <p class="mt-4 flex items-center gap-2 text-sm">
+                        <span class="text-muted line-through">{{ $product->formattedOriginalPrice() }}</span>
+                        @if ($product->discountPercent())
+                            <span class="rounded-full bg-primary px-2.5 py-0.5 text-xs font-bold text-white">-{{ $product->discountPercent() }}%</span>
+                        @endif
+                    </p>
                 @endif
                 <p class="font-display text-4xl font-semibold text-accent">{{ $product->formattedPrice() }}</p>
 
@@ -75,9 +82,6 @@
                     <x-alert type="danger" class="mt-6">{{ $message }}</x-alert>
                 @enderror
                 @if ($product->isAvailable())
-                    <x-alert class="mt-6">
-                        Sau khi xác nhận, hệ thống khóa tài khoản, trừ số dư ví và hiện thông tin đăng nhập chỉ trên đơn hàng của bạn.
-                    </x-alert>
                     @auth
                         <a href="{{ route('purchases.create', $product) }}" class="mt-4 inline-flex rounded-full bg-primary px-5 py-3 text-sm font-semibold text-white hover:bg-primary-dark">Mua ngay</a>
                     @else

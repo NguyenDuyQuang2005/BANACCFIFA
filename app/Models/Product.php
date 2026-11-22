@@ -47,7 +47,7 @@ class Product extends Model
         return [
             'price' => 'decimal:2',
             'original_price' => 'decimal:2',
-            'bp' => 'decimal:2',
+            'bp' => 'integer',
             'ovr' => 'integer',
             'featured_players' => 'array',
             'status' => ProductStatus::class,
@@ -145,6 +145,21 @@ class Product extends Model
         return Number::format((float) $this->price, locale: 'vi').'₫';
     }
 
+    /**
+     * Discount shown on the listing, derived from the original price (null when not discounted).
+     */
+    public function discountPercent(): ?int
+    {
+        $original = (float) $this->original_price;
+        $price = (float) $this->price;
+
+        if ($this->original_price === null || $original <= 0 || $original <= $price) {
+            return null;
+        }
+
+        return max(1, (int) round(($original - $price) / $original * 100));
+    }
+
     public function formattedOriginalPrice(): ?string
     {
         if ($this->original_price === null) {
@@ -160,6 +175,13 @@ class Product extends Model
             return '—';
         }
 
-        return Number::format((float) $this->bp, locale: 'vi');
+        $bp = (int) $this->bp;
+        $short = fn (float $value): string => rtrim(rtrim(number_format($value, 1, ',', '.'), '0'), ',');
+
+        return match (true) {
+            $bp >= 1_000_000_000 => $short($bp / 1_000_000_000).' tỷ',
+            $bp >= 1_000_000 => $short($bp / 1_000_000).' triệu',
+            default => Number::format($bp, locale: 'vi'),
+        };
     }
 }

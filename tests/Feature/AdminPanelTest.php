@@ -172,7 +172,7 @@ class AdminPanelTest extends TestCase
 
         $this->actingAs($admin)
             ->post(route('admin.products.images.store', $product), [
-                'image' => UploadedFile::fake()->image('acc.jpg'),
+                'images' => [UploadedFile::fake()->image('acc.jpg')],
                 'alt' => 'Anh acc',
                 'is_primary' => '1',
             ])
