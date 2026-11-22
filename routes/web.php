@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\AffiliateController as AdminAffiliateController;
 use App\Http\Controllers\Admin\BankTransactionController;
 use App\Http\Controllers\Admin\BannerController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\CoachSkillController;
 use App\Http\Controllers\Admin\ContactMessageController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\DepositReviewController;
@@ -13,12 +14,15 @@ use App\Http\Controllers\Admin\HeroBannerController;
 use App\Http\Controllers\Admin\MemberController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\PaymentMethodController;
+use App\Http\Controllers\Admin\PlayerController as AdminPlayerController;
+use App\Http\Controllers\Admin\PlayerSeasonController;
 use App\Http\Controllers\Admin\PopupController;
 use App\Http\Controllers\Admin\ProductController as AdminProductController;
 use App\Http\Controllers\Admin\ProductImageController;
 use App\Http\Controllers\Admin\RevenueController;
 use App\Http\Controllers\Admin\ServiceController as AdminServiceController;
 use App\Http\Controllers\Admin\SettingController;
+use App\Http\Controllers\Admin\SkillMoveController;
 use App\Http\Controllers\Admin\WalletTransactionController;
 use App\Http\Controllers\AffiliateController;
 use App\Http\Controllers\AffiliateLinkController;
@@ -60,6 +64,7 @@ Route::get('/chinh-sach', [PageController::class, 'policies'])->name('policies')
 
 Route::get('/cong-cu', [ToolController::class, 'index'])->name('tools.index');
 Route::get('/cong-cu/{tool}', [ToolController::class, 'show'])->name('tools.show');
+Route::get('/cong-cu/cau-thu/{player}', [ToolController::class, 'player'])->name('tools.player');
 
 Route::get('/giao-dich-gan-day', [RecentTransactionController::class, 'index'])->name('transactions.recent');
 Route::post('/webhook/thanh-toan', [PaymentWebhookController::class, 'store'])->name('payments.webhook');
@@ -142,6 +147,24 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         ->except(['show'])
         ->parameters(['dich-vu' => 'service'])
         ->names('services');
+
+    Route::get('/cong-cu/cau-thu/mau-csv', [AdminPlayerController::class, 'template'])->name('tool-players.template');
+    Route::post('/cong-cu/cau-thu/nhap-csv', [AdminPlayerController::class, 'import'])->name('tool-players.import');
+    Route::resource('cong-cu/cau-thu', AdminPlayerController::class)
+        ->except(['show'])
+        ->parameters(['cau-thu' => 'player'])
+        ->names('tool-players');
+    Route::post('/cong-cu/mua-the', [PlayerSeasonController::class, 'store'])->name('tool-seasons.store');
+    Route::put('/cong-cu/mua-the/{season}', [PlayerSeasonController::class, 'update'])->name('tool-seasons.update');
+    Route::delete('/cong-cu/mua-the/{season}', [PlayerSeasonController::class, 'destroy'])->name('tool-seasons.destroy');
+    Route::resource('cong-cu/ky-thuat', SkillMoveController::class)
+        ->except(['show'])
+        ->parameters(['ky-thuat' => 'skill'])
+        ->names('tool-skills');
+    Route::get('/cong-cu/ky-nang-hlv', [CoachSkillController::class, 'index'])->name('tool-coach-skills.index');
+    Route::post('/cong-cu/ky-nang-hlv', [CoachSkillController::class, 'store'])->name('tool-coach-skills.store');
+    Route::put('/cong-cu/ky-nang-hlv/{coachSkill}', [CoachSkillController::class, 'update'])->name('tool-coach-skills.update');
+    Route::delete('/cong-cu/ky-nang-hlv/{coachSkill}', [CoachSkillController::class, 'destroy'])->name('tool-coach-skills.destroy');
 
     Route::resource('popup', PopupController::class)
         ->except(['show'])

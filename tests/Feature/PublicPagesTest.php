@@ -39,12 +39,13 @@ class PublicPagesTest extends TestCase
             ->assertSee('Tài khoản cá nhân', false);
     }
 
-    public function test_known_tool_page_explains_missing_formula(): void
+    public function test_tax_tool_page_renders_calculator(): void
     {
         $this->get(route('tools.show', 'tinh-thue'))
             ->assertOk()
             ->assertSee('Tính thuế cầu thủ', false)
-            ->assertSee('Công cụ chưa tính toán', false);
+            ->assertSee('data-tax-calculator', false)
+            ->assertDontSee('Công cụ chưa tính toán', false);
     }
 
     public function test_unknown_tool_page_returns_404(): void

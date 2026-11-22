@@ -19,7 +19,7 @@ class HomePageTest extends TestCase
         $response->assertSee('Sản phẩm nổi bật', false);
         $response->assertSee('Công cụ FC Online', false);
         $response->assertSee('Tính thuế cầu thủ', false);
-        $response->assertSee('Đào tạo OVR', false);
+        $response->assertSee('đào tạo OVR', false);
         $response->assertDontSee('Bài viết', false);
     }
 

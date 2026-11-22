@@ -55,6 +55,11 @@
                             ['admin.affiliates.index', 'admin.affiliates.*', 'Affiliate · Giới thiệu'],
                             ['admin.contact-messages.index', 'admin.contact-messages.*', 'Liên hệ'],
                         ],
+                        'Công cụ FC Online' => [
+                            ['admin.tool-players.index', 'admin.tool-players.*', 'Cầu thủ & giờ reset'],
+                            ['admin.tool-skills.index', 'admin.tool-skills.*', 'Tra cứu kỹ thuật'],
+                            ['admin.tool-coach-skills.index', 'admin.tool-coach-skills.*', 'Ranking kỹ năng HLV'],
+                        ],
                         'Hệ thống' => [
                             ['admin.banners.index', 'admin.banners.*', 'Banner'],
                             ['admin.popups.index', 'admin.popups.*', 'Popup'],
