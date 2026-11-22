@@ -140,6 +140,29 @@
         </div>
     </section>
 
+    <section class="mx-auto max-w-7xl px-4 py-14 lg:px-8" aria-labelledby="san-pham-noi-bat">
+        <div class="mb-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+            <div>
+                <p class="text-xs uppercase tracking-[0.2em] text-accent">Marketplace</p>
+                <h2 id="san-pham-noi-bat" class="mt-2 font-display text-2xl font-semibold">Sản phẩm nổi bật</h2>
+            </div>
+            <a href="{{ route('catalog.index') }}" class="text-sm text-muted hover:text-accent">Xem tất cả tài khoản →</a>
+        </div>
+
+        @if ($products->isEmpty())
+            <x-empty-state title="Chưa có sản phẩm" :action-href="route('catalog.index')" action-label="Xem danh mục">
+                Sản phẩm nổi bật chỉ hiện tài khoản còn hàng được đánh dấu nổi bật trong database. Website không tạo tài khoản giả.
+            </x-empty-state>
+        @else
+            <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                @foreach ($products as $product)
+                    <x-product-card :product="$product" />
+                @endforeach
+            </div>
+            <x-pagination />
+        @endif
+    </section>
+
     <section class="mx-auto max-w-7xl px-4 py-6 lg:px-8" aria-labelledby="danh-muc-tai-khoan">
         <div class="mb-6">
             <p class="text-xs uppercase tracking-[0.2em] text-accent">Catalog</p>
@@ -178,60 +201,6 @@
             </div>
         </section>
     @endif
-
-    <section class="mx-auto max-w-7xl px-4 py-14 lg:px-8" aria-labelledby="san-pham-noi-bat">
-        <div class="mb-6 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-            <div>
-                <p class="text-xs uppercase tracking-[0.2em] text-accent">Marketplace</p>
-                <h2 id="san-pham-noi-bat" class="mt-2 font-display text-2xl font-semibold">Sản phẩm nổi bật</h2>
-            </div>
-            <a href="{{ route('catalog.index') }}" class="text-sm text-muted hover:text-accent">Xem tất cả tài khoản →</a>
-        </div>
-
-        @if ($products->isEmpty())
-            <x-empty-state title="Chưa có sản phẩm" :action-href="route('catalog.index')" action-label="Xem danh mục">
-                Sản phẩm nổi bật chỉ hiện tài khoản còn hàng được đánh dấu nổi bật trong database. Website không tạo tài khoản giả.
-            </x-empty-state>
-        @else
-            <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-                @foreach ($products as $product)
-                    <x-product-card :product="$product" />
-                @endforeach
-            </div>
-            <x-pagination />
-        @endif
-    </section>
-
-    <section class="mx-auto max-w-7xl px-4 py-6 lg:px-8" aria-labelledby="bai-viet-moi">
-        <div class="mb-6 flex items-end justify-between">
-            <div>
-                <p class="text-xs uppercase tracking-[0.2em] text-accent">Nội dung</p>
-                <h2 id="bai-viet-moi" class="mt-2 font-display text-2xl font-semibold">Bài viết mới</h2>
-            </div>
-            <a href="{{ route('posts.index') }}" class="text-sm text-muted hover:text-accent">Tất cả bài viết</a>
-        </div>
-        @if ($posts->isEmpty())
-            <x-empty-state title="Chưa có bài viết" :action-href="route('posts.index')" action-label="Mở mục bài viết">
-                Bài viết mới sẽ hiện ảnh đại diện, tiêu đề, mô tả ngắn, ngày đăng, danh mục và nút đọc tiếp khi module nội dung được triển khai.
-            </x-empty-state>
-        @else
-            <div class="grid gap-4 md:grid-cols-3">
-                @foreach ($posts as $post)
-                    <article class="overflow-hidden rounded-3xl border border-line bg-surface">
-                        @if (! empty($post['image_url']))
-                            <img src="{{ $post['image_url'] }}" alt="{{ $post['title'] }}" class="aspect-video w-full object-cover">
-                        @endif
-                        <div class="space-y-2 p-5">
-                            <p class="text-xs uppercase tracking-widest text-muted">{{ $post['category'] ?? 'Bài viết' }} · {{ $post['published_at'] ?? '' }}</p>
-                            <h3 class="font-display text-lg font-semibold">{{ $post['title'] }}</h3>
-                            <p class="text-sm text-muted">{{ $post['excerpt'] ?? '' }}</p>
-                            <a href="{{ $post['url'] ?? route('posts.index') }}" class="inline-flex text-sm font-semibold text-accent">Đọc tiếp</a>
-                        </div>
-                    </article>
-                @endforeach
-            </div>
-        @endif
-    </section>
 
     <section class="mx-auto max-w-7xl px-4 py-14 lg:px-8" aria-labelledby="cong-cu-fc-online">
         <div class="mb-6">

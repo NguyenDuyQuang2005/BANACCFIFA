@@ -51,7 +51,6 @@ Route::get('/dich-vu', [ServiceController::class, 'index'])->name('services.inde
 Route::get('/gioi-thieu/{code}', AffiliateLinkController::class)->middleware('throttle:60,1')->where('code', '[A-Za-z0-9]{4,16}')->name('affiliate.track');
 
 Route::get('/huong-dan', [PageController::class, 'guides'])->name('guides');
-Route::get('/bai-viet', [PageController::class, 'posts'])->name('posts.index');
 Route::get('/lich-su-giao-dich', [TransactionHistoryController::class, 'index'])->name('transactions.history');
 Route::get('/lien-he', [ContactController::class, 'create'])->name('contact');
 Route::post('/lien-he', [ContactController::class, 'store'])->middleware('throttle:5,10')->name('contact.store');

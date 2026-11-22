@@ -11,7 +11,6 @@ class PublicPagesTest extends TestCase
     {
         $this->get(route('catalog.index'))->assertOk()->assertSee('Danh mục tài khoản', false);
         $this->get(route('guides'))->assertOk()->assertSee('Hướng dẫn', false);
-        $this->get(route('posts.index'))->assertOk()->assertSee('Bài viết', false);
         $this->get(route('tools.index'))->assertOk()->assertSee('Công cụ FC Online', false);
         $this->get(route('transactions.history'))->assertOk()->assertSee('Lịch sử giao dịch', false);
         $this->get(route('contact'))->assertOk()->assertSee('Liên hệ', false);

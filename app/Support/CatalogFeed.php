@@ -106,14 +106,6 @@ class CatalogFeed
             });
     }
 
-    /**
-     * @return Collection<int, array<string, mixed>>
-     */
-    public function latestPosts(): Collection
-    {
-        return collect();
-    }
-
     public function memberCount(): ?int
     {
         $count = User::query()->count();

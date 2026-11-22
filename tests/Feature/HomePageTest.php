@@ -17,10 +17,23 @@ class HomePageTest extends TestCase
         $response->assertSee('Giao dịch gần đây', false);
         $response->assertSee('Danh mục tài khoản', false);
         $response->assertSee('Sản phẩm nổi bật', false);
-        $response->assertSee('Bài viết mới', false);
         $response->assertSee('Công cụ FC Online', false);
         $response->assertSee('Tính thuế cầu thủ', false);
         $response->assertSee('Đào tạo OVR', false);
+        $response->assertDontSee('Bài viết', false);
+    }
+
+    public function test_featured_products_come_before_account_categories(): void
+    {
+        $this->get(route('home'))->assertSeeInOrder([
+            'id="san-pham-noi-bat"',
+            'id="danh-muc-tai-khoan"',
+        ], false);
+    }
+
+    public function test_posts_page_no_longer_exists(): void
+    {
+        $this->get('/bai-viet')->assertNotFound();
     }
 
     public function test_home_page_shows_empty_states_instead_of_placeholder_data(): void
@@ -31,7 +44,6 @@ class HomePageTest extends TestCase
         $response->assertSee('Chưa có giao dịch hoàn tất', false);
         $response->assertSee('Chưa có danh mục', false);
         $response->assertSee('Chưa có sản phẩm', false);
-        $response->assertSee('Chưa có bài viết', false);
         $response->assertSee('Chưa có số liệu', false);
         $response->assertDontSee('3.717', false);
     }

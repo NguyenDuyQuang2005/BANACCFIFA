@@ -34,7 +34,6 @@
 
     <a href="{{ route('services.index') }}" class="{{ $linkClass }}">Dịch vụ FCO</a>
     <a href="{{ route('guides') }}" class="{{ $linkClass }}">Hướng dẫn</a>
-    <a href="{{ route('posts.index') }}" class="{{ $linkClass }}">Bài viết</a>
 
     @if ($isMobile)
         <a href="{{ route('tools.index') }}" class="{{ $linkClass }}">Công cụ FC Online</a>

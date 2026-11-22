@@ -21,7 +21,6 @@ class HomeController extends Controller
             'services' => Service::query()->visible()->limit(8)->get(),
             'products' => $this->catalogFeed->featuredProducts(),
             'transactions' => $this->catalogFeed->recentCompletedTransactions(),
-            'posts' => $this->catalogFeed->latestPosts(),
             'memberCount' => $this->catalogFeed->memberCount(),
             'completedOrderCount' => $this->catalogFeed->completedOrderCount(),
             'tools' => collect(config('tools.modules', [])),

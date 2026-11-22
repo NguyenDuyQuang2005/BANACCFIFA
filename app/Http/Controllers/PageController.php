@@ -15,15 +15,6 @@ class PageController extends Controller
         ]);
     }
 
-    public function posts(): View
-    {
-        return view('pages.placeholder', [
-            'title' => 'Bài viết',
-            'heading' => 'Bài viết',
-            'message' => 'Danh sách bài viết, danh mục và SEO sẽ được triển khai ở Giai đoạn 4 khi có nội dung thật từ Admin.',
-        ]);
-    }
-
     public function terms(): View
     {
         return view('pages.placeholder', [
