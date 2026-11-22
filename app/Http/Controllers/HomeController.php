@@ -22,7 +22,6 @@ class HomeController extends Controller
             'products' => $this->catalogFeed->featuredProducts(),
             'transactions' => $this->catalogFeed->recentCompletedTransactions(),
             'memberCount' => $this->catalogFeed->memberCount(),
-            'completedOrderCount' => $this->catalogFeed->completedOrderCount(),
             'tools' => collect(config('tools.modules', [])),
         ]);
     }

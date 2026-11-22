@@ -29,6 +29,12 @@ return [
         'google_verification' => env('SITE_GOOGLE_VERIFICATION'),
     ],
 
+    /*
+    | Sold account listings are hidden right away and removed this many days after the sale.
+    | The buyer keeps the order and the game-account details (stored on the order itself).
+    */
+    'sold_product_retention_days' => (int) env('SOLD_PRODUCT_RETENTION_DAYS', 30),
+
     'admin' => [
         'email' => env('ADMIN_EMAIL'),
         'password' => env('ADMIN_PASSWORD'),

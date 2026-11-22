@@ -113,13 +113,6 @@ class CatalogFeed
         return $count > 0 ? $count : null;
     }
 
-    public function completedOrderCount(): ?int
-    {
-        $count = Order::query()->where('status', OrderStatus::Completed)->count();
-
-        return $count > 0 ? $count : null;
-    }
-
     /**
      * @param  Builder<Product>  $query
      * @param  array<string, mixed>  $filters

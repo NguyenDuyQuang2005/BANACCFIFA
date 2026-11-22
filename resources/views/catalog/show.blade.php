@@ -82,11 +82,7 @@
                     <x-alert type="danger" class="mt-6">{{ $message }}</x-alert>
                 @enderror
                 @if ($product->isAvailable())
-                    @auth
-                        <a href="{{ route('purchases.create', $product) }}" class="mt-4 inline-flex rounded-full bg-primary px-5 py-3 text-sm font-semibold text-white hover:bg-primary-dark">Mua ngay</a>
-                    @else
-                        <a href="{{ route('login') }}" class="mt-4 inline-flex rounded-full bg-primary px-5 py-3 text-sm font-semibold text-white hover:bg-primary-dark">Đăng nhập để mua</a>
-                    @endauth
+                    <x-buy-button :product="$product" size="lg" class="mt-6 inline-flex" />
                 @else
                     <x-alert type="warning" class="mt-6">
                         Tài khoản này đã bán hoặc không còn khả dụng. Thông tin đăng nhập game không được hiển thị công khai.

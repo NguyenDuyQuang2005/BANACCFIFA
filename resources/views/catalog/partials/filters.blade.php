@@ -17,15 +17,6 @@
     <x-form-input name="ovr_min" label="OVR từ" type="number" :value="$filters['ovr_min'] ?? ''" />
 
     <label class="grid gap-2 text-sm">
-        <span class="font-medium">Tình trạng</span>
-        <select name="status" class="w-full rounded-xl border border-line bg-canvas px-3 py-2.5 outline-none focus:border-accent">
-            <option value="" @selected(($filters['status'] ?? '') === '')>Tất cả</option>
-            <option value="available" @selected(($filters['status'] ?? '') === 'available')>Còn hàng</option>
-            <option value="sold" @selected(($filters['status'] ?? '') === 'sold')>Đã bán</option>
-        </select>
-    </label>
-
-    <label class="grid gap-2 text-sm">
         <span class="font-medium">Sắp xếp</span>
         <select name="sort" class="w-full rounded-xl border border-line bg-canvas px-3 py-2.5 outline-none focus:border-accent">
             <option value="newest" @selected(($filters['sort'] ?? 'newest') === 'newest')>Mới nhất</option>

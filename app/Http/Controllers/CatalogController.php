@@ -27,7 +27,7 @@ class CatalogController extends Controller
 
     public function show(Product $product): View
     {
-        abort_if($product->status === ProductStatus::Hidden, 404);
+        abort_unless($product->status === ProductStatus::Available, 404);
         abort_unless($product->category?->is_visible, 404);
 
         $product->load(['category', 'images']);

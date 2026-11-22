@@ -13,6 +13,7 @@ use App\Models\Product;
 use App\Models\Service;
 use App\Models\SkillMove;
 use App\Models\User;
+use App\Models\Voucher;
 use App\Observers\AdminActivityObserver;
 use App\Support\SiteSettings;
 use App\View\Composers\SiteLayoutComposer;
@@ -40,7 +41,7 @@ class AppServiceProvider extends ServiceProvider
         Gate::define('access-admin', fn (User $user): bool => $user->isStaff() && ! $user->isBanned());
         Gate::define('manage-system', fn (User $user): bool => $user->isAdmin() && ! $user->isBanned());
 
-        foreach ([Category::class, Product::class, PaymentMethod::class, Banner::class, Popup::class, Service::class, Player::class, PlayerSeason::class, SkillMove::class, CoachSkill::class] as $model) {
+        foreach ([Category::class, Product::class, PaymentMethod::class, Banner::class, Popup::class, Service::class, Player::class, PlayerSeason::class, SkillMove::class, CoachSkill::class, Voucher::class] as $model) {
             $model::observe(AdminActivityObserver::class);
         }
 

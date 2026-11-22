@@ -110,9 +110,7 @@ class AuthWalletPurchaseTest extends TestCase
             ->get(route('orders.show', $order))
             ->assertForbidden();
 
-        $this->get(route('catalog.show', $product))
-            ->assertOk()
-            ->assertDontSee('game-user:secret-pass', false);
+        $this->get(route('catalog.show', $product))->assertNotFound();
     }
 
     public function test_purchase_fails_when_balance_is_insufficient(): void

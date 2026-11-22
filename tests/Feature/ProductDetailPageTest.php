@@ -9,7 +9,7 @@ class ProductDetailPageTest extends TestCase
 {
     public function test_product_detail_shows_public_fields_and_hides_credentials(): void
     {
-        $product = Product::factory()->sold()->create([
+        $product = Product::factory()->create([
             'name' => 'Acc da ban',
             'code' => 'DT3001',
             'featured_players' => ['Cau thu A'],
@@ -21,7 +21,7 @@ class ProductDetailPageTest extends TestCase
         $response->assertSee('DT3001', false);
         $response->assertSee('Acc da ban', false);
         $response->assertSee('Cau thu A', false);
-        $response->assertSee('Đã bán', false);
+        $this->get(route('catalog.show', Product::factory()->sold()->create()))->assertNotFound();
         $response->assertDontSee('game-user:secret-pass', false);
         $response->assertDontSee('secret-pass', false);
     }

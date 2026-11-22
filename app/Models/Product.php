@@ -97,7 +97,7 @@ class Product extends Model
     #[Scope]
     protected function public(Builder $query): Builder
     {
-        return $query->whereIn('status', [ProductStatus::Available, ProductStatus::Sold]);
+        return $query->where('status', ProductStatus::Available);
     }
 
     #[Scope]

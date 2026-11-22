@@ -43,6 +43,7 @@
                             ['admin.products.index', 'admin.products.*', 'Tài khoản game'],
                             ['admin.services.index', 'admin.services.*', 'Dịch vụ FCO'],
                             ['admin.orders.index', 'admin.orders.*', 'Đơn hàng'],
+                            ['admin.vouchers.index', 'admin.vouchers.*', 'Voucher'],
                         ],
                         'Tài chính' => [
                             ['admin.deposits.index', 'admin.deposits.*', 'Duyệt nạp tiền'],

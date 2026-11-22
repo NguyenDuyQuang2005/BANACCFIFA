@@ -106,6 +106,233 @@ ready(() => {
         });
     };
 
+    const buyModal = document.querySelector('[data-buy-modal]');
+
+    if (buyModal) {
+        const csrf = document.querySelector('meta[name="csrf-token"]')?.content ?? '';
+        const isAuthenticated = buyModal.dataset.auth === '1';
+        const el = (name) => buyModal.querySelector(`[data-buy-${name}]`);
+        const voucherInput = el('voucher');
+        let current = null;
+        let appliedVoucher = '';
+
+        const showStep = (step) => {
+            buyModal.querySelectorAll('[data-buy-step]').forEach((section) => {
+                section.classList.toggle('hidden', section.dataset.buyStep !== step);
+            });
+        };
+
+        const setError = (message) => {
+            const box = el('error');
+            box.textContent = message || '';
+            box.classList.toggle('hidden', ! message);
+        };
+
+        const post = async (url, body) => {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: { Accept: 'application/json', 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrf },
+                body: JSON.stringify(body),
+                credentials: 'same-origin',
+            });
+            const data = await response.json().catch(() => ({}));
+
+            return { ok: response.ok, status: response.status, data };
+        };
+
+        const close = () => {
+            buyModal.classList.add('hidden');
+            buyModal.classList.remove('grid');
+            document.body.classList.remove('overflow-hidden');
+            current = null;
+        };
+
+        const renderQuote = (quote) => {
+            if (! quote.available) {
+                showStep('unavailable');
+
+                return;
+            }
+
+            el('subtotal').textContent = quote.subtotal;
+            el('discount').textContent = `-${quote.discount}`;
+            el('discount-row').classList.toggle('hidden', ! quote.has_discount);
+            el('discount-row').classList.toggle('flex', quote.has_discount);
+            el('total').textContent = quote.total;
+            el('balance').textContent = quote.balance;
+            el('shortfall').textContent = quote.shortfall;
+            el('shortfall-box').classList.toggle('hidden', quote.enough_balance);
+            el('confirm').disabled = ! quote.enough_balance;
+
+            const note = el('voucher-note');
+            note.classList.toggle('hidden', ! quote.voucher && ! quote.voucher_error);
+            note.className = `mt-2 text-xs ${quote.voucher_error ? 'text-primary' : 'text-emerald-400'}${! quote.voucher && ! quote.voucher_error ? ' hidden' : ''}`;
+            note.textContent = quote.voucher_error ? quote.voucher_error : (quote.voucher ? `Đã áp dụng ${quote.voucher}` : '');
+            appliedVoucher = quote.voucher ? voucherInput.value.trim() : '';
+
+            showStep('checkout');
+        };
+
+        const loadQuote = async (voucher = '') => {
+            el('loading-text').textContent = 'Đang kiểm tra giá…';
+            showStep('loading');
+            setError('');
+
+            try {
+                const { ok, status, data } = await post(current.quoteUrl, { voucher });
+
+                if (status === 401 || status === 419) {
+                    window.location.reload();
+
+                    return;
+                }
+
+                if (! ok) {
+                    throw new Error(data.message || 'Không tải được thông tin thanh toán.');
+                }
+
+                renderQuote(data);
+            } catch (error) {
+                showStep('checkout');
+                setError(error.message);
+            }
+        };
+
+        const open = (button) => {
+            current = {
+                quoteUrl: button.dataset.buyQuoteUrl,
+                buyUrl: button.dataset.buyUrl,
+            };
+            el('code').textContent = button.dataset.buyCode || '';
+            el('name').textContent = button.dataset.buyName || 'Mua tài khoản';
+            const image = el('image');
+            image.classList.toggle('hidden', ! button.dataset.buyImage);
+            if (button.dataset.buyImage) {
+                image.src = button.dataset.buyImage;
+            }
+            voucherInput.value = '';
+            appliedVoucher = '';
+            el('voucher-note').classList.add('hidden');
+
+            buyModal.classList.remove('hidden');
+            buyModal.classList.add('grid');
+            document.body.classList.add('overflow-hidden');
+
+            if (! isAuthenticated) {
+                showStep('guest');
+
+                return;
+            }
+
+            loadQuote();
+        };
+
+        document.addEventListener('click', (event) => {
+            const button = event.target.closest('[data-buy]');
+
+            if (button) {
+                event.preventDefault();
+                open(button);
+            }
+        });
+
+        buyModal.querySelectorAll('[data-buy-close]').forEach((button) => button.addEventListener('click', close));
+        buyModal.addEventListener('click', (event) => {
+            if (event.target === buyModal && ! buyModal.querySelector('[data-buy-step="success"]:not(.hidden)')) {
+                close();
+            }
+        });
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape' && ! buyModal.classList.contains('hidden')) {
+                close();
+            }
+        });
+
+        el('voucher-form').addEventListener('submit', (event) => {
+            event.preventDefault();
+            loadQuote(voucherInput.value.trim());
+        });
+
+        el('confirm').addEventListener('click', async () => {
+            if (! current) {
+                return;
+            }
+
+            el('loading-text').textContent = 'Đang thanh toán…';
+            showStep('loading');
+
+            try {
+                const { ok, status, data } = await post(current.buyUrl, { voucher: appliedVoucher });
+
+                if (status === 401 || status === 419) {
+                    window.location.reload();
+
+                    return;
+                }
+
+                if (! ok) {
+                    if (data.reason === 'unavailable') {
+                        el('unavailable-text').textContent = data.message;
+                        showStep('unavailable');
+
+                        return;
+                    }
+
+                    showStep('checkout');
+                    setError(data.message || 'Thanh toán không thành công.');
+
+                    return;
+                }
+
+                el('order-code').textContent = data.order.code;
+                el('paid').textContent = data.order.total;
+                el('new-balance').textContent = data.balance;
+                el('order-link').href = data.order.url;
+
+                const list = el('credentials');
+                list.replaceChildren();
+
+                data.items.forEach((item) => {
+                    const card = document.createElement('div');
+                    card.className = 'rounded-2xl border border-line bg-canvas p-4';
+
+                    const title = document.createElement('p');
+                    title.className = 'text-xs text-muted';
+                    title.textContent = `${item.code} · ${item.name}`;
+
+                    const secret = document.createElement('pre');
+                    secret.className = 'mt-2 whitespace-pre-wrap break-all font-mono text-sm text-ink';
+                    secret.textContent = item.credentials || 'Admin sẽ gửi thông tin tài khoản trong đơn hàng.';
+
+                    card.append(title, secret);
+
+                    if (item.credentials) {
+                        const copy = document.createElement('button');
+                        copy.type = 'button';
+                        copy.className = 'mt-3 rounded-lg border border-line px-3 py-1 text-xs text-muted hover:border-accent hover:text-accent';
+                        copy.textContent = 'Sao chép';
+                        copy.addEventListener('click', async () => {
+                            try {
+                                await navigator.clipboard.writeText(item.credentials);
+                                copy.textContent = 'Đã chép';
+                            } catch {
+                                copy.textContent = 'Hãy chọn và chép thủ công';
+                            }
+                        });
+                        card.append(copy);
+                    }
+
+                    list.append(card);
+                });
+
+                showStep('success');
+            } catch {
+                showStep('checkout');
+                setError('Mất kết nối. Kiểm tra "Đơn hàng của tôi" trước khi thử lại để tránh mua trùng.');
+            }
+        });
+    }
+
     const galleryMain = document.querySelector('[data-gallery-main]');
     const galleryThumbs = [...document.querySelectorAll('[data-gallery-thumb]')];
 

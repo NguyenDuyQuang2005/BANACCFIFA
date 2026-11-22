@@ -17,6 +17,9 @@ use Illuminate\Support\Number;
 #[Fillable([
     'user_id',
     'code',
+    'subtotal',
+    'discount_total',
+    'voucher_code',
     'total',
     'status',
     'customer_phone_masked',
@@ -33,6 +36,8 @@ class Order extends Model
     protected function casts(): array
     {
         return [
+            'subtotal' => 'decimal:2',
+            'discount_total' => 'decimal:2',
             'total' => 'decimal:2',
             'status' => OrderStatus::class,
             'completed_at' => 'datetime',

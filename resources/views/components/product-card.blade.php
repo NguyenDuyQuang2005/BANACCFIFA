@@ -45,9 +45,7 @@
                 <a href="{{ route('catalog.show', $product) }}" class="rounded-full border border-line px-3 py-2 text-xs font-semibold text-ink hover:border-accent">
                     Chi tiết
                 </a>
-                <a href="{{ route('catalog.show', $product) }}" class="rounded-full bg-primary px-3 py-2 text-xs font-semibold text-white hover:bg-primary-dark">
-                    Mua ngay
-                </a>
+                <x-buy-button :product="$product" />
             </div>
         </div>
     </div>

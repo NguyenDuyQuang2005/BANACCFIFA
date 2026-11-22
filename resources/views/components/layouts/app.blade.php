@@ -49,6 +49,8 @@
         <x-footer :site="$site" :tools="$navTools" />
         <x-mobile-dock />
 
+        <x-buy-modal />
+
         @if ($sitePopup)
             <x-site-popup :popup="$sitePopup" />
         @endif

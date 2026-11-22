@@ -23,6 +23,7 @@ use App\Http\Controllers\Admin\RevenueController;
 use App\Http\Controllers\Admin\ServiceController as AdminServiceController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\SkillMoveController;
+use App\Http\Controllers\Admin\VoucherController;
 use App\Http\Controllers\Admin\WalletTransactionController;
 use App\Http\Controllers\AffiliateController;
 use App\Http\Controllers\AffiliateLinkController;
@@ -99,7 +100,8 @@ Route::middleware('auth')->group(function (): void {
     Route::get('/don-hang/{order}', [OrderController::class, 'show'])->name('orders.show');
 
     Route::get('/mua/{product}', [PurchaseController::class, 'create'])->name('purchases.create');
-    Route::post('/mua/{product}', [PurchaseController::class, 'store'])->name('purchases.store');
+    Route::post('/mua/{product}/bao-gia', [PurchaseController::class, 'quote'])->middleware('throttle:30,1')->name('purchases.quote');
+    Route::post('/mua/{product}', [PurchaseController::class, 'store'])->middleware('throttle:10,1')->name('purchases.store');
 });
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function (): void {
@@ -143,6 +145,11 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         ->except(['show'])
         ->parameters(['banner' => 'banner'])
         ->names('banners');
+
+    Route::resource('voucher', VoucherController::class)
+        ->except(['show'])
+        ->parameters(['voucher' => 'voucher'])
+        ->names('vouchers');
 
     Route::resource('dich-vu', AdminServiceController::class)
         ->except(['show'])

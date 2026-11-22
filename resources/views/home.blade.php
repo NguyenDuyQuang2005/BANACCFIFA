@@ -41,24 +41,14 @@
 
             <div class="grid gap-3 self-start rounded-3xl border border-line bg-surface/80 p-6">
                 <p class="text-xs uppercase tracking-[0.2em] text-muted">Thống kê hệ thống</p>
-                @if ($memberCount !== null || $completedOrderCount !== null)
-                    <dl class="grid grid-cols-2 gap-4">
-                        @if ($memberCount !== null)
-                            <div>
-                                <dt class="text-sm text-muted">Thành viên</dt>
-                                <dd class="font-display text-3xl font-semibold text-accent">{{ number_format($memberCount) }}</dd>
-                            </div>
-                        @endif
-                        @if ($completedOrderCount !== null)
-                            <div>
-                                <dt class="text-sm text-muted">Giao dịch hoàn tất</dt>
-                                <dd class="font-display text-3xl font-semibold text-ink">{{ number_format($completedOrderCount) }}</dd>
-                            </div>
-                        @endif
+                @if ($memberCount !== null)
+                    <dl>
+                        <dt class="text-sm text-muted">Thành viên</dt>
+                        <dd class="font-display text-3xl font-semibold text-accent">{{ number_format($memberCount) }}</dd>
                     </dl>
                 @else
                     <x-empty-state title="Chưa có số liệu">
-                        Thành viên và giao dịch chỉ được đếm từ database khi module thành viên và đơn hàng đi vào hoạt động.
+                        Số thành viên được đếm từ database khi có người đăng ký.
                     </x-empty-state>
                 @endif
             </div>

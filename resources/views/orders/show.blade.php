@@ -4,7 +4,7 @@
         @if (session('status'))
             <x-alert type="success" class="mt-6">{{ session('status') }}</x-alert>
         @endif
-        <p class="mt-2 text-sm text-muted">{{ $order->formattedTotal() }} · {{ $order->status->label() }}</p>
+        <p class="mt-2 text-sm text-muted">{{ $order->formattedTotal() }}@if ((float) $order->discount_total > 0) (đã giảm {{ number_format((float) $order->discount_total, 0, ',', '.') }}₫ bằng mã {{ $order->voucher_code }})@endif · {{ $order->status->label() }}</p>
         @foreach ($order->items as $item)
             <section class="mt-6 rounded-3xl border border-line bg-surface p-6">
                 <p class="text-xs uppercase tracking-widest text-muted">{{ $item->product_code }}</p>
